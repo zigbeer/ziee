@@ -1,10 +1,10 @@
 {
   "name": "ziee",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "make test-all"
   },
   "repository": {
     "type": "git",
@@ -15,5 +15,13 @@
   "bugs": {
     "url": "https://github.com/zigbeer/ziee/issues"
   },
-  "homepage": "https://github.com/zigbeer/ziee#readme"
+  "homepage": "https://github.com/zigbeer/ziee#readme",
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^2.5.3"
+  },
+  "dependencies": {
+    "busyman": "^0.1.1",
+    "zcl-id": "0.0.4"
+  }
 }
