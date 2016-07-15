@@ -423,7 +423,7 @@ describe('attrs - Ziee Class Functional Check', function () {
                 }
             }
         }, false);
-
+        console.log(ziee.get('lightingColorCtrl', 'attrs', 'bar'));
         ziee.read('lightingColorCtrl', 'bar', function (err, data) {
             if (err)
                 done();
@@ -450,7 +450,7 @@ describe('attrs - Ziee Class Functional Check', function () {
                     done();
             }
         });
-        
+
         ziee.write('lightingColorCtrl', 'foo', 99, function (err, data) {
             if (data === 99) {
                 ok++;
