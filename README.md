@@ -1,10 +1,10 @@
 # ziee
 
-[![NPM](https://nodei.co/npm/smartobject.png?downloads=true)](https://nodei.co/npm/ziee/)  
+[![NPM](https://nodei.co/npm/ziee.png?downloads=true)](https://nodei.co/npm/ziee/)  
 
-[![Build Status](https://travis-ci.org/PeterEB/smartobject.svg?branch=develop)](https://travis-ci.org/zigbeer/ziee)
-[![npm](https://img.shields.io/npm/v/smartobject.svg?maxAge=2592000)](https://www.npmjs.com/package/ziee)
-[![npm](https://img.shields.io/npm/l/smartobject.svg?maxAge=2592000)](https://www.npmjs.com/package/ziee)
+[![Build Status](https://travis-ci.org/zigbeer/ziee.svg?branch=develop)](https://travis-ci.org/zigbeer/ziee)
+[![npm](https://img.shields.io/npm/v/ziee.svg?maxAge=2592000)](https://www.npmjs.com/package/ziee)
+[![npm](https://img.shields.io/npm/l/ziee.svg?maxAge=2592000)](https://www.npmjs.com/package/ziee)
 
 ## Table of Contents
 
