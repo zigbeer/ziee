@@ -1,8 +1,5 @@
 # ziee
 
-smartobject
-========================
-
 [![NPM](https://nodei.co/npm/smartobject.png?downloads=true)](https://nodei.co/npm/ziee/)  
 
 [![Build Status](https://travis-ci.org/PeterEB/smartobject.svg?branch=develop)](https://travis-ci.org/zigbeer/ziee)
