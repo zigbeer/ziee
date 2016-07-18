@@ -1,1 +1,1 @@
-module.exports = reqiure('./lib/ziee');
+module.exports = require('./lib/ziee.js');
