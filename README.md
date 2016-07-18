@@ -39,7 +39,7 @@ var Ziee = require('ziee');
 var zApp = {};              //  Your zigbee application, I take a mock object here as an example
 
 // Step 2: New a ziee instance to have all your attributes, access control flgas, zcl commands, and direction in it
-var ziee = new ziee(zApp);
+var ziee = new ziee();
 
 // Step 3: Initialize a 'lightingColorCtrl' Cluster in your `ziee`, with its attributes, access control flags, .etc.  
 
@@ -88,9 +88,11 @@ ziee.init('lightingColorCtrl', 'cmds', {
     }
 });
 
+// Step 4: Glue your ziee to the zapp. After glued, invoke ziee.init() will throw.
+ziee.glue(zApp);
 
-// Step 4: Accesss your cluters
-//   >> 4-1: getter and setter
+// Step 5: Accesss your cluters
+//   >> 5-1: getter and setter
 ziee.get('lightingColorCtrl', 'dir', 'value');          // 1
 ziee.get('lightingColorCtrl', 'attrs', 'currentHue');   // 10
 ziee.get('lightingColorCtrl', 'attrs', 'colorMode');    // { read: function () { ... }, _isCb: true }
@@ -104,7 +106,7 @@ ziee.set('lightingColorCtrl', 'cmds', 'stepColor', function (zapp, stepx, stepy,
     // ...
 });
 
-//   >> 4-2: Asynchronous read/write attributes.
+//   >> 5-2: Asynchronous read/write attributes.
 //           Be careful, read/write methods are only valid to access attributes.
 ziee.read('lightingColorCtrl', 'currentHue', function (err, data) {
     if (!err)
@@ -116,14 +118,14 @@ ziee.write('lightingColorCtrl', 'currentHue', 18, function (err, data) {
         console.log(data);  // 18
 });
 
-//   >> 4-3: Asynchronous execute zcl command.
+//   >> 5-3: Asynchronous execute zcl command.
 //           Be careful, exec method is only valid to commands.
 ziee.exec('lightingColorCtrl', 'stepColor', { stepx: 6, stepy: 110, transtime: 20 }, function (err, data) {
     if (!err)
         console.log(data);
 });
 
-//   >> 4-4: Asynchronous dump
+//   >> 5-4: Asynchronous dump
 ziee.dump(function (err, data) {    // dump all clusters
 //    {
 //        lightingColorCtrl: {
@@ -160,7 +162,7 @@ ziee.dump('lightingColorCtrl', 'acls', function (err, data) {    // dump a spec
 //    }
 });
 
-//   >> 4-5: Synchronous dump
+//   >> 5-5: Synchronous dump
 ziee.dumpSync('lightingColorCtrl', 'acls');
 //    {
 //        currentHue: 'RW',
@@ -187,6 +189,7 @@ TBD: see examples in [usage](#Usage);
 
 * [new Ziee()](#API_ziee)
 * [init()](#API_init)
+* [glue()](#API_glue)
 * [has()](#API_has)
 * [get()](#API_get)
 * [set()](#API_set)
@@ -285,6 +288,29 @@ ziee.init('lightingColorCtrl', 'cmds', {
         }
     }
 });
+```
+
+*************************************************
+<a name="API_glue"></a>
+### glue(zapp)
+Glue `ziee` to a zapp.  
+  
+**Arguments:**  
+
+1. (_Object_): zigbee app  
+
+**Returns:**  
+
+* (_Object_): `ziee`   
+
+**Examples:** 
+
+```js
+var zApp = {};  //  Your zigbee application, I take a mock object here as an example
+
+// ...
+
+ziee.glue(zApp);
 ```
 
 *************************************************
