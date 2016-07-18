@@ -1,1 +1,1 @@
-var SmartObject = require('smartobject');
+module.exports = reqiure('./lib/ziee');

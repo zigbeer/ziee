@@ -171,8 +171,8 @@ describe('cmds - Ziee Class Functional Check', function () {
     });
 
     it('moveHue should be equal new method after set', function () {
-        var method2 = function (zapp, arg1, arg2, cb) {
-            cb(null, [ arg1, arg2 ]);
+        var method2 = function (zapp, argObj, cb) {
+            cb(null, argObj);
         };
         expect(ziee.set('lightingColorCtrl', 'cmds', 'moveHue', method2)).to.be.true;
         expect(ziee.get('lightingColorCtrl', 'cmds', 'moveHue').exec).to.be.equal(method2);
@@ -190,8 +190,8 @@ describe('cmds - Ziee Class Functional Check', function () {
     });
 
     it('should execute', function (done) {
-        ziee.exec('lightingColorCtrl', 'moveHue', ['hi', 'hello'], function (err, data) {
-            if (data[0] === 'hi' && data[1] === 'hello')
+        ziee.exec('lightingColorCtrl', 'moveHue', { x: 'hi', y: 'hello' }, function (err, data) {
+            if (data.x === 'hi' && data.y === 'hello')
                 done();
         });
     });
@@ -353,7 +353,7 @@ describe('attrs - Ziee Class Functional Check', function () {
     });
 
     it('should not execute an attr', function (done) {
-        ziee.exec('lightingColorCtrl', 'driftCompensation', [], function (err, data) {
+        ziee.exec('lightingColorCtrl', 'driftCompensation', {}, function (err, data) {
             if (err)
                 done();
         });
@@ -423,7 +423,6 @@ describe('attrs - Ziee Class Functional Check', function () {
                 }
             }
         }, false);
-        console.log(ziee.get('lightingColorCtrl', 'attrs', 'bar'));
         ziee.read('lightingColorCtrl', 'bar', function (err, data) {
             if (err)
                 done();

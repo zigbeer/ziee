@@ -81,7 +81,8 @@ ziee.init('lightingColorCtrl', 'cmds', {
         // ...
     },
     stepColor: {    // you can also wrap a command within an object by key 'exec'
-        exec: function (zapp, stepx, stepy, transtime, cb) {
+        exec: function (zapp, argObj, cb) {
+            // argObj = { stepx, stepy, transtime }
             // ...
         }
     }
@@ -117,8 +118,7 @@ ziee.write('lightingColorCtrl', 'currentHue', 18, function (err, data) {
 
 //   >> 4-3: Asynchronous execute zcl command.
 //           Be careful, exec method is only valid to commands.
-ziee.exec('lightingColorCtrl', 'stepColor', [ 6, 110, 20 ], function (err, data) {
-    // paramerts: [ stepx, stepy, transtime ] should be wrapped up in an array
+ziee.exec('lightingColorCtrl', 'stepColor', { stepx: 6, stepy: 110, transtime: 20 }, function (err, data) {
     if (!err)
         console.log(data);
 });
@@ -279,7 +279,8 @@ ziee.init('lightingColorCtrl', 'cmds', {
         // ...
     },
     stepColor: {    // you can also wrap a command within an object by key 'exec'
-        exec: function (zapp, stepx, stepy, transtime, cb) {
+        exec: function (zapp, argObj, cb) {
+            // argObj = { stepx, stepy, transtime }
             // ...
         }
     }
@@ -468,26 +469,26 @@ ziee.write('lightingColorCtrl', 'xxx', 18, function (err, data) {
 
 *************************************************
 <a name="API_exec"></a>
-### exec(cid, rid, args, callback)
-Execute the specified _Resource_. The executable _Resource_ is a procedure you've defined, for example, blinking a led for _N_ times when the _Resource_ is invoked.  
+### exec(cid, cmdId, argObj, callback)
+Execute the specified _Command_. The executable _Command_ is a ZCL-defined functional procedure.  
   
 Be careful, there is no need to put `sid` in the argument. Exec is only valid upon commands.
   
 **Arguments:**  
 
-1. `cid` (_String_ | _Number_): _Cluster Id_ of the target.  
-2. `rid` (_String_ | _Number_): _Resource Id_ of the target.   
-3. `args` (_Array_): The parameters required by the command.  
+1. `cid` (_String_ | _Number_): _Cluster Id_.  
+2. `cmdId` (_String_ | _Number_): _Command Id_ of the cluster.   
+3. `argObj` (_Object_): The parameters required by the command.  
 5. `callback` (_Function_): `function (err, data) { ... }`. Will be called when execution is performed or any error occurs, where `data` is your command should repond back.  
   
 * This table show you what results may the callback receive:   
 
-|       err      |      data          |       Description                                                  |  
-|----------------|--------------------|--------------------------------------------------------------------|  
-| Error object   | `'_notfound_'`     | _Resource_ not found.                                              |  
-| Error object   | `'_unexecutable_'` | _Resource_ is unexecutable.                                        |  
-| Error object   | `'_badarg_'`       | Input arguments is not an array.                                   |  
-| `null`         | Depends            | _Resource_ is successfully executed, `data` depends on your will.  |  
+|       err      |      data          |       Description                                                     |  
+|----------------|--------------------|-----------------------------------------------------------------------|  
+| Error object   | `'_notfound_'`     | _Resource_ not found.                                                 |  
+| Error object   | `'_unexecutable_'` | _Resource_ is unexecutable.                                           |  
+| Error object   | `'_badarg_'`       | Input arguments is not an array.                                      |  
+| `null`         | Depends            | _Command_ is successfully executed, `data` depends on ZCL definition. |  
 
 **Returns:**  
 
@@ -496,12 +497,15 @@ Be careful, there is no need to put `sid` in the argument. Exec is only valid up
 **Examples:** 
 
 ```js
-ziee.exec('hvacThermostat', 'getWeeklySchedule', [ 110, 20 ], function (err, data) {
-    // paramerts: [ daystoreturn, modetoreturn ] should be wrapped up in an array
+ziee.exec('hvacThermostat', 'getWeeklySchedule', {
+    daystoreturn: 110,
+    modetoreturn: 20
+}, function (err, data) {
     if (!err)
         console.log(data);
 
-    // data is 'getWeeklyScheduleRsp' obejct
+    // data is 'getWeeklyScheduleRsp' response data obejct defined by ZCL
+    // your exec function should return this object back through the callback
     // {
     //     numoftrans:3,
     //     dayofweek: 2,
