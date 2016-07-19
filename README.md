@@ -4,7 +4,7 @@
 
 [![NPM](https://nodei.co/npm/ziee.png?downloads=true)](https://nodei.co/npm/ziee/)  
 
-[![Build Status](https://travis-ci.org/zigbeer/ziee.svg?branch=develop)](https://travis-ci.org/zigbeer/ziee)
+[![Build Status](https://travis-ci.org/zigbeer/ziee.svg?branch=master)](https://travis-ci.org/zigbeer/ziee)
 [![npm](https://img.shields.io/npm/v/ziee.svg?maxAge=2592000)](https://www.npmjs.com/package/ziee)
 [![npm](https://img.shields.io/npm/l/ziee.svg?maxAge=2592000)](https://www.npmjs.com/package/ziee)
 
