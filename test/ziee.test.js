@@ -216,7 +216,6 @@ describe('attrs - Ziee Class Functional Check', function () {
         colorMode: 1
     });
 
-
     it('should has currentHue', function () {
         expect(ziee.has('lightingColorCtrl', 'attrs', 'currentHue')).to.be.true;
     });
@@ -383,7 +382,6 @@ describe('attrs - Ziee Class Functional Check', function () {
         });
     });
 
-
     it('should init something with read cb but write should fail', function (done) {
         ziee.init('lightingColorCtrl', 'attrs', {
             foo: {
@@ -458,6 +456,23 @@ describe('attrs - Ziee Class Functional Check', function () {
             }
         });
     });
-
 });
 
+describe('attrs - Ziee Class Functional Check', function () {
+    var ziee = new Ziee(zapp);
+    ziee.init('lightingColorCtrl', 'dir', { value: 1 });
+    ziee.init('haApplianceEventsAlerts', 'dir', { value: 1 });
+    ziee.init('ssIasZone', 'dir', { value: 1 });
+    ziee.init('hvacThermostat', 'dir', { value: 3 });
+    ziee.init('closuresDoorLock', 'dir', { value: 3 });
+    ziee.init('genRssiLocation', 'dir', { value: 2 });
+    ziee.init('genAlarms', 'dir', { value: 2 });
+    ziee.init('genOnOff', 'dir', { value: 3 });
+
+    it('should export correct cluster list', function () {
+        expect(ziee.clusterList()).to.be.deep.equal({
+            in: [ 768, 2818, 1280, 513, 257, 6 ],
+            out: [ 513, 257, 11, 9, 6 ]
+        });
+    });
+});
