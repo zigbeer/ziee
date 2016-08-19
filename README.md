@@ -480,7 +480,7 @@ ziee.set('lightingColorCtrl', 'cmds', 'stepColor', function (zapp, stepx, stepy,
 
 *************************************************
 <a name="API_read"></a>
-### read(cid, attrId, callback[, opt])
+### read(cid, attrId, callback)
 Asynchronously read the specified _Attribute_ value.  
 
 **Arguments:**  
