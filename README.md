@@ -7,13 +7,18 @@ A base class to create clusters and abstract hardware for zigbee applications.
 [![npm](https://img.shields.io/npm/v/ziee.svg?maxAge=2592000)](https://www.npmjs.com/package/ziee)
 [![npm](https://img.shields.io/npm/l/ziee.svg?maxAge=2592000)](https://www.npmjs.com/package/ziee)
 
+<br />
+
 ## Table of Contents
 
 1. [Overview](#Overview)  
 2. [Installation](#Installation)  
 3. [Initialization of Clusters](#Initialization)  
 4. [Access Clusters](#access)  
+5. [Dump Data](#dump)  
 5. [APIs](#APIs)  
+
+<br />
 
 <a name="Overview"></a>
 ## 1. Overview
@@ -111,18 +116,44 @@ Here is a quick example that will walk you through the steps of initializing a '
     ziee.glue(zApp);
     ```
 
-    - After glued, invoke ziee.init() again will throw you an error. Which means you have to init every thing before gluing clusters to zapp.
+    - After glued, invoke ziee.init() again will throw you an error. Which means you have to init every thing before gluing ziee to zapp.
 
 <a name="access"></a>
 ## 4. Access Clusters
 
+ziee provides you with `read()`, `write()`, `exec()`, `get()`, and `set()` methods to access the clusters. It is highly recommended to use asynchronous read/write methods to access the attributes, especially for those should be got from certain operations, i.e. reading from an ADC, writing to a PWM port.  
 
-* Step 3: Glue your ziee to the zapp.
+### Asynchronous read/write/exec methods
 
+* read(): Asynchronously read the specified _**Attribute**_ value. 
+* write(): Asynchronously write a value to the specified _**Attribute**_.
+* exec(): Asynchronously execute the specified _Command_.
 
 ```js
-// Step 5: Accesss your cluters
-//   >> 5-1: getter and setter
+// read/write methods are only valid to access attributes.
+ziee.read('lightingColorCtrl', 'currentHue', function (err, data) {
+    if (!err)
+        console.log(data);  // 10
+});
+
+ziee.write('lightingColorCtrl', 'currentHue', 18, function (err, data) {
+    if (!err)
+        console.log(data);  // 18
+});
+
+// exec method is only valid to commands.
+ziee.exec('lightingColorCtrl', 'stepColor', { stepx: 6, stepy: 110, transtime: 20 }, function (err, data) {
+    if (!err)
+        console.log(data);
+});
+```
+
+### Synchronous getter and setter
+
+* get(): Synchronously get the specified _Resource_. This getter will return you the raw content of the specified _Resource_.
+* set(): Synchronously set a value to the specified _Resource_. This setter will mutate the raw content of the specified _Resource_.
+
+```js
 ziee.get('lightingColorCtrl', 'dir', 'value');          // 1
 ziee.get('lightingColorCtrl', 'attrs', 'currentHue');   // 10
 ziee.get('lightingColorCtrl', 'attrs', 'colorMode');    // { read: function () { ... }, _isCb: true }
@@ -135,82 +166,86 @@ ziee.set('lightingColorCtrl', 'acls', 'currentHue', 'W');
 ziee.set('lightingColorCtrl', 'cmds', 'stepColor', function (zapp, stepx, stepy, transtime, cb) {
     // ...
 });
+```
 
-//   >> 5-2: Asynchronous read/write attributes.
-//           Be careful, read/write methods are only valid to access attributes.
-ziee.read('lightingColorCtrl', 'currentHue', function (err, data) {
-    if (!err)
-        console.log(data);  // 10
+<a name="dump"></a>
+## 5. Dump Data
+
+### Asynchronous dump
+
+```js
+// dump all clusters
+ziee.dump(function (err, data) {
+/*
+    {
+        lightingColorCtrl: {
+            dir: { value: 1 },
+            acls: { ... },
+            attrs: { ... },
+            cmds: { ... }
+        },
+        ssIasZone: {
+            dir: { value: 0 },
+            acls: { ... },
+            attrs: { ... },
+            cmds: { ... }
+        },
+        ...
+    }
+*/
 });
 
-ziee.write('lightingColorCtrl', 'currentHue', 18, function (err, data) {
-    if (!err)
-        console.log(data);  // 18
+// dump a cluster
+ziee.dump('lightingColorCtrl', function (err, data) {
+/*
+    {
+        dir: { value: 1 },
+        acls: { ... },
+        attrs: { ... },
+        cmds: { ... },
+        ...   // if you have some thing more
+    }
+*/
 });
 
-//   >> 5-3: Asynchronous execute zcl command.
-//           Be careful, exec method is only valid to commands.
-ziee.exec('lightingColorCtrl', 'stepColor', { stepx: 6, stepy: 110, transtime: 20 }, function (err, data) {
-    if (!err)
-        console.log(data);
-});
-
-//   >> 5-4: Asynchronous dump
-ziee.dump(function (err, data) {    // dump all clusters
-//    {
-//        lightingColorCtrl: {
-//            dir: { value: 1 },
-//            acls: { ... },
-//            attrs: { ... },
-//            cmds: { ... }
-//        },
-//        ssIasZone: {
-//            dir: { value: 0 },
-//            acls: { ... },
-//            attrs: { ... },
-//            cmds: { ... }
-//        },
-//        ...
-//    }
-});
-
-ziee.dump('lightingColorCtrl', function (err, data) {    // dump a cluster
-//    {
-//        dir: { value: 1 },
-//        acls: { ... },
-//        attrs: { ... },
-//        cmds: { ... },
-//        ...   // if you have some thing more
-//    }
-});
-
-ziee.dump('lightingColorCtrl', 'acls', function (err, data) {    // dump a spec
-//    {
-//        currentHue: 'RW',
-//        currentSaturation: 'R',
-//        colorMode: 'R'
-//    }
-});
-
-//   >> 5-5: Synchronous dump
-ziee.dumpSync('lightingColorCtrl', 'acls');
-//    {
-//        currentHue: 'RW',
-//        currentSaturation: 'R',
-//        colorMode: 'R'
-//    }
-});
-
-ziee.dumpSync('lightingColorCtrl', 'cmds');
-//    {
-//        stepColor: { exec: '_exec_'},
-//        ...
-//    }
+// dump a spec
+ziee.dump('lightingColorCtrl', 'acls', function (err, data) {
+/*
+    {
+        currentHue: 'RW',
+        currentSaturation: 'R',
+        colorMode: 'R'
+    }
+*/
 });
 ```
 
+### Synchronous dump
+
+```js
+// dump acces control flags
+ziee.dumpSync('lightingColorCtrl', 'acls');
+/*
+    {
+        currentHue: 'RW',
+        currentSaturation: 'R',
+        colorMode: 'R'
+    }
+*/
+
+// dump commands, the function cannot be serialized and it will be 
+// dumped into a string '_exec_'
+ziee.dumpSync('lightingColorCtrl', 'cmds');
+/*
+    {
+        stepColor: { exec: '_exec_'},
+        ...
+    }
+*/
+```
+
 <a name="APIs"></a>
-## 4. APIs
+## 6. APIs
 
 * [new Ziee()](#API_ziee)
 * [init()](#API_init)
