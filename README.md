@@ -1,6 +1,5 @@
 # ziee
-  
-<br />
+A base class to create clusters and abstract hardware for zigbee applications.  
 
 [![NPM](https://nodei.co/npm/ziee.png?downloads=true)](https://nodei.co/npm/ziee/)  
 
@@ -13,9 +12,7 @@
 1. [Overview](#Overview)  
 2. [Installation](#Installation)  
 3. [Usage](#Usage)  
-4. [Resources Planning](#Resources)  
-5. [APIs](#APIs)  
-
+4. [APIs](#APIs)  
 
 <a name="Overview"></a>
 ## 1. Overview
@@ -31,49 +28,78 @@
 <a name="Usage"></a>
 ## 3. Usage
 
-Here is a quick example to show you how to create your _Clusters_ with only few steps:
+Here is a quick example to show you how to create your _Clusters_ with few steps:
 
 ```js
-// Step 1: Import the Ziee Class
-var Ziee = require('ziee');
-var zApp = {};              //  Your zigbee application, I take a mock object here as an example
+/*
+ * Step 1: Import the Ziee Class
+ */
 
-// Step 2: New a ziee instance to have all your attributes, access control flgas, zcl commands, and direction in it
+var Ziee = require('ziee'),
+    zApp = {};  //  Your zigbee application, I take a mock object here as an example
+
+/*
+ * Step 2: New a ziee instance to have all your attributes,
+ *         access control flgas, zcl commands, and direction in it.
+ */
+
 var ziee = new ziee();
 
-// Step 3: Initialize a 'lightingColorCtrl' Cluster in your `ziee`, with its attributes, access control flags, .etc.  
+/*
+ * Step 3: Initialize a 'lightingColorCtrl' Cluster in your ziee, including its
+ *         (1)direction (2)attributes (3)access control flgas, and (4)zcl commands.
+ */
 
-ziee.init('lightingColorCtrl', 'dir', { value: 1 });    // direction accepts an object with a key 'value' only
+    // (1) direction: accepts an object with a key 'value' only
+    //        >> value = 1: it is an input cluster
+    //        >> value = 2: it is an output cluster
+    //        >> value = 3: it is an input/output cluster
+
+ziee.init('lightingColorCtrl', 'dir', { value: 1 });
+
+    // (2) attributes: abstract hardware operation with read/write callbacks if needed
+    //        >> initialize attributes of 'currentHue', 'currentSaturation', and 'colorMode'
+
 ziee.init('lightingColorCtrl', 'attrs', {
-    currentHue: 10,             // (1) a simple primitive
-    currentSaturation: {        // (2) with read/write method
+    currentHue: 10,             // (A) a simple primitive
+    currentSaturation: {        // (B) with read/write method
         read: function (cb) {
-            // ... get your data from some operations
+            // ... do something to get data
             cb(null, data);
         },
         write: function (val, cb) {
-            // ... write the value with some operations
+            // ... do something to set data
             cb(null, val);
         }
     },
-    colorMode: {                // (3) with read method
+    colorMode: {                // (C) with read method
         read: function (cb) {
-            // ... get your data from some operations
+            // ... do something to get data
             cb(null, data);
         }
     }
 }); 
 
-ziee.init('lightingColorCtrl', 'acls', {    // acls are often used to control the authority from remote access
-    currentHue: 'RW',                       // local access depends on read/write methods, not depends on flags
+// (3) access control flgas: the access control of each attribute  
+//        >> 'R': read-only
+//        >> 'W': write-only
+//        >> 'RW': readable and writable
+//     [note] acls are often used to control the authority from remote access.
+//            local access depends on read/write methods, not depends on flags
+
+ziee.init('lightingColorCtrl', 'acls', {
+    currentHue: 'RW',
     currentSaturation: 'R',
     colorMode: 'R'
 });
 
+// (4) zcl commands: define commands that your cluster supports
+//        >> define commands of 'moveToHue', 'stepHue', and 'stepColor'
+//     [note] In each command method, ziee will pass you the zapp with 1st argument,
+              and pass you the cb with the last argument.  
+
 ziee.init('lightingColorCtrl', 'cmds', {
     moveToHue: function (zapp, movemode, rate, cb) {
-        // ziee will pass zapp with 1st argument, and pass cb to the last argument to you
-
         // ... do something, then call the err-first callback
         cb(null, something);
     },
@@ -88,8 +114,12 @@ ziee.init('lightingColorCtrl', 'cmds', {
     }
 });
 
-// Step 4: Glue your ziee to the zapp. After glued, invoke ziee.init() will throw.
-ziee.glue(zApp);
+/*
+ *  Step 4: Glue your ziee to the zapp.
+ *
+ *  [note] After glued, invoke ziee.init() again will throw you an error.
+ *         Which means you have to init every thing before gluing clusters to zapp.
+ */
 
 // Step 5: Accesss your cluters
 //   >> 5-1: getter and setter
@@ -179,13 +209,8 @@ ziee.dumpSync('lightingColorCtrl', 'cmds');
 });
 ```
 
-<a name="Resources"></a>
-## 4. Resources Planning
-
-TBD: see examples in [usage](#Usage);
-
 <a name="APIs"></a>
-## 5. APIs
+## 4. APIs
 
 * [new Ziee()](#API_ziee)
 * [init()](#API_init)
@@ -205,12 +230,12 @@ TBD: see examples in [usage](#Usage);
 Exposed by `require('ziee')`.  
 
 <a name="API_smartobject"></a>
-### new Ziee(zapp)
-Create a new instance of Ziee class. This document will use `ziee` to indicate this kind of instance. A `ziee` can hold many _Clusters_ in it.  
+### new Ziee()
+Create an instance of Ziee class. This document will use `ziee` to indicate this kind of instance. A `ziee` can hold many _Clusters_ in it.  
 
 **Arguments:**  
 
-1. zapp (_Object_): Your application. You can use `ziee.zapp` to refer to your app in read/write/exec callbacks.  
+1. (_none_) 
 
 **Returns:**  
 
@@ -220,22 +245,20 @@ Create a new instance of Ziee class. This document will use `ziee` to indicate t
 
 ```js
 var Ziee = require('ziee');
-var myApp = {}; // yours must be more complicated
-
-var ziee = new Ziee(myApp);
+var ziee = new Ziee();
 ```
 
 *************************************************
 <a name="API_init"></a>
-### init(cid, sid, resrcs[, isZcl])
-Initialize your cluster and all its specs.  
+### init(cid, sid, spec[, isZcl])
+Initialize your cluster and all its specs. Here, a `spec` is an object required by the corresponding init procedure.  
   
 **Arguments:**  
 
 1. `cid` (_String_ | _Number_): _Cluster Id_. Will be turned into a key in string internally.  
 2. `sid` (_String_): _Spec Id_, which accepts `'dir'`, `'acls'`, `'attrs'`, and `'cmds'`.  
-3. `resrcs` (_Object_): An object holds all resources (attribues, flags, command methods, ...) in your spec.  
-4. `isZcl` (_Boolean_): Force to use ZCL-defined ids if `true`, and default is `true`. If you like to add something that is not ZCL-defined, please init() it wirh `isZcl=false`.   
+3. `spec` (_Object_): An object holds all resources (attribues, flags, command methods, ...) corresponding to which `sid` to be initialized.  
+4. `isZcl` (_Boolean_, optional): Force to use ZCL-defined ids if `true`, and default is `true`. If you like to add something that is not ZCL-defined, please init() it with `false`.  
 
 **Returns:**  
 
@@ -244,7 +267,8 @@ Initialize your cluster and all its specs.
 **Examples:** 
 
 ```js
-ziee.init('lightingColorCtrl', 'dir', { value: 1 });    // direction accepts an object with a key 'value' only
+ziee.init('lightingColorCtrl', 'dir', { value: 1 });
+
 ziee.init('lightingColorCtrl', 'attrs', {
     currentHue: 10,             // (1) a simple primitive
     currentSaturation: {        // (2) with read/write method
@@ -308,7 +332,7 @@ Glue `ziee` to a zapp.
 ```js
 var zApp = {};  //  Your zigbee application, I take a mock object here as an example
 
-// ...
+// ... do the initialization
 
 ziee.glue(zApp);
 ```
@@ -350,12 +374,11 @@ To see if `ziee` has the specified _Cluster_, Cluster Spec_, or _Cluster Resourc
 **Examples:** 
 
 ```js
-ziee.has('lightingColorCtrl, 'cmds', 'stepHue');            // true
-ziee.has('lightingColorCtrl, 'cmds', 'xxx');                // false
-ziee.has('lightingColorCtrl, 'attrs', 'currentSaturation'); // true
-ziee.has('lightingColorCtrl, 'attrs', 'yyy');               // false
-ziee.has('lightingColorCtrl, 'acls', 'currentSaturation');  // true
-
+ziee.has('lightingColorCtrl', 'cmds', 'stepHue');            // true
+ziee.has('lightingColorCtrl', 'cmds', 'xxx');                // false
+ziee.has('lightingColorCtrl', 'attrs', 'currentSaturation'); // true
+ziee.has('lightingColorCtrl', 'attrs', 'yyy');               // false
+ziee.has('lightingColorCtrl', 'acls', 'currentSaturation');  // true
 ```
 
 *************************************************
@@ -454,16 +477,15 @@ ziee.read('lightingColorCtrl', 'xxxx', function (err, data) {
 
 *************************************************
 <a name="API_write"></a>
-### write(cid, rid, value, callback[)
-Asynchronously write a value to the specified _Resource_.  
-Be careful, there is no need to put `sid` in the argument. Write is only valid upon attributes.
+### write(cid, attrId, value, callback)
+Asynchronously write a value to the specified _Attribute_. There is no need to put `sid` in the argument, since `write()` is only valid upon attributes.  
 
 **Arguments:**  
 
 1. `cid` (_String_ | _Number_): _Cluster Id_ of the target.  
-2. `rid` (_String_ | _Number_): _Resource Id_ of the target.   
-3. `value` (_Depends_): The value to write to the specified _Resource_.  
-4. `callback` (_Function_): `function (err, data) { ... }`. Will be called when reading is done or any error occurs, where `data` is the _Resource_ value. (When an error occurs, `so` will pass you a string like `'_notfound_'` with `data`, you can use it as a hint to choose a status code to respond back to the requester.)  
+2. `attrId` (_String_ | _Number_): _Attribute Id_ of the target.   
+3. `value` (_Depends_): The value to write to the specified _Attribute_.  
+4. `callback` (_Function_): `function (err, data) { ... }`. Will be called when writing is done or any error occurs, where `data` is the _Attribute_ value. (When an error occurs, `ziee` will pass you a string like `'_notfound_'` with `data`)  
 
 * This table show you what results may the callback receive:   
 
@@ -473,7 +495,6 @@ Be careful, there is no need to put `sid` in the argument. Write is only valid u
 | Error object   | `'_unwritable_'` | _Resource_ is unwritable.                                          |  
 | Error object   | `'_exec_'`       | _Resource_ is unwritable (Becasue it is an executable _Resource_). |  
 | `null`         | Depends          | _Resource_ is successfully write.                                  |  
-
 
 **Returns:**  
 
@@ -496,25 +517,25 @@ ziee.write('lightingColorCtrl', 'xxx', 18, function (err, data) {
 *************************************************
 <a name="API_exec"></a>
 ### exec(cid, cmdId, argObj, callback)
-Execute the specified _Command_. The executable _Command_ is a ZCL-defined functional procedure.  
-  
-Be careful, there is no need to put `sid` in the argument. Exec is only valid upon commands.
+Execute the specified _Command_. The executable _Command_ is a ZCL-defined functional procedure. There is no need to put `sid` in the argument, since `exec()` is only valid upon commands.  
   
 **Arguments:**  
 
-1. `cid` (_String_ | _Number_): _Cluster Id_.  
-2. `cmdId` (_String_ | _Number_): _Command Id_ of the cluster.   
-3. `argObj` (_Object_): The parameters required by the command.  
-5. `callback` (_Function_): `function (err, data) { ... }`. Will be called when execution is performed or any error occurs, where `data` is your command should repond back.  
+1. `cid` (_String_ | _Number_): _Cluster Id_.
+2. `cmdId` (_String_ | _Number_): _Command Id_ of the cluster.
+3. `argObj` (_Object_): The parameters required by the command.
+4. `callback` (_Function_): `function (err, data) { ... }`. Will be called when execution is performed or any error occurs, where `data` is your command should repond back.
   
-* This table show you what results may the callback receive:   
+* To see what data you should respond back upon receiving a command, please go to [ZCL Functional Command Reference Table](https://github.com/zigbeer/zcl-packet#32-zcl-functional-command-reference-table) for more information.
+    - For example, when you receive a **'getWeeklySchedule'** command, you should respond a **'getWeeklyScheduleRsp'** back to the requester.  
+* This table shows you what results may the callback receive:   
 
-|       err      |      data          |       Description                                                     |  
-|----------------|--------------------|-----------------------------------------------------------------------|  
-| Error object   | `'_notfound_'`     | _Resource_ not found.                                                 |  
-| Error object   | `'_unexecutable_'` | _Resource_ is unexecutable.                                           |  
-| Error object   | `'_badarg_'`       | Input arguments is not an array.                                      |  
-| `null`         | Depends            | _Command_ is successfully executed, `data` depends on ZCL definition. |  
+|       err      |      data          |       Description                                                         |  
+|----------------|--------------------|---------------------------------------------------------------------------|  
+| Error object   | `'_notfound_'`     | _Resource_ not found.                                                     |  
+| Error object   | `'_unexecutable_'` | _Resource_ is unexecutable.                                               |  
+| Error object   | `'_badarg_'`       | Input arguments is not an array.                                          |  
+| `null`         | Depends            | _Command_ is successfully executed, and `data` depends on ZCL definition. |  
 
 **Returns:**  
 
@@ -529,31 +550,35 @@ ziee.exec('hvacThermostat', 'getWeeklySchedule', {
 }, function (err, data) {
     if (!err)
         console.log(data);
+/*
+    data is 'getWeeklyScheduleRsp' response data obejct defined by ZCL, and
+    your exec function should return an object like:
 
-    // data is 'getWeeklyScheduleRsp' response data obejct defined by ZCL
-    // your exec function should return this object back through the callback
-    // {
-    //     numoftrans:3,
-    //     dayofweek: 2,
-    //     mode: 1,
-    //     thermoseqmode: 1
-    // }
+    {
+        numoftrans:3,
+        dayofweek: 2,
+        mode: 1,
+        thermoseqmode: 1
+    }
+
+    back through the callback.
+*/
 });
 ```
 
 *************************************************
 <a name="API_dump"></a>
 ### dump([cid[, sid],] callback)
-Asynchronously dump data from `ziee`. This dumping method uses the asynchronous `read()` under the hood.  
+Asynchronously dump data from `ziee`. This method uses the asynchronous `read()` under the hood.  
 
 * Given with `cid`, `sid`, and a `callback` to dump data of a _Spec_.  
 * Given with `cid` and a `callback` to dump data of a _Cluster_.  
-* Given with only a `callback` to dump data of whole _Clusters_.  
+* Given with only a `callback` to dump data of all _Clusters_.  
 
 **Arguments:**  
 
-1. `cid` (_String_ | _Number_): _Cluster Id_ of the target.  
-2. `sid` (_String_): Spec Id_ of the target, which accepts `'dir'`, `'acls'`, `'attrs'`, and `'cmds'`.  
+1. `cid` (_String_ | _Number_, optional): _Cluster Id_ of the target.  
+2. `sid` (_String_, optional): Spec Id_ of the target, which accepts `'dir'`, `'acls'`, `'attrs'`, and `'cmds'`.  
 3. `callback` (_Function_): `function (err, data) { }`.  
 
 **Returns:**  
@@ -563,58 +588,67 @@ Asynchronously dump data from `ziee`. This dumping method uses the asynchronous 
 **Examples:** 
 
 ```js
-ziee.dump(function (err, data) {    // dump all clusters
-//    {
-//        lightingColorCtrl: {
-//            dir: { value: 1 },
-//            acls: { ... },
-//            attrs: { ... },
-//            cmds: { ... }
-//        },
-//        ssIasZone: {
-//            dir: { value: 0 },
-//            acls: { ... },
-//            attrs: { ... },
-//            cmds: { ... }
-//        },
-//        ...
-//    }
+// (1) Dump all clusters
+ziee.dump(function (err, data) {
+/*
+    {
+        lightingColorCtrl: {
+            dir: { value: 1 },
+            acls: { ... },
+            attrs: { ... },
+            cmds: { ... }
+        },
+        ssIasZone: {
+            dir: { value: 0 },
+            acls: { ... },
+            attrs: { ... },
+            cmds: { ... }
+        },
+        ...
+    }
+*/
 });
 
-ziee.dump('lightingColorCtrl', function (err, data) {    // dump a cluster
-//    {
-//        dir: { value: 1 },
-//        acls: { ... },
-//        attrs: { ... },
-//        cmds: { ... },
-//        ...   // if you have some thing more
-//    }
+// (2) Dump a cluster
+ziee.dump('lightingColorCtrl', function (err, data) {
+/*
+    {
+        dir: { value: 1 },
+        acls: { ... },
+        attrs: { ... },
+        cmds: { ... },
+        ...   // if you have some thing more
+    }
+*/
 });
 
-ziee.dump('lightingColorCtrl', 'acls', function (err, data) {    // dump a spec
-//    {
-//        currentHue: 'RW',
-//        currentSaturation: 'R',
-//        colorMode: 'R'
-//    }
+// (3) Dump a spec
+ziee.dump('lightingColorCtrl', 'acls', function (err, data) {
+/*
+    {
+        currentHue: 'RW',
+        currentSaturation: 'R',
+        colorMode: 'R'
+    }
+*/
 });
 ```
 
 *************************************************
 <a name="API_dumpSync"></a>
 ### dumpSync([cid[, sid]])
-Synchronously dump data from `ziee`. This dumping method uses the synchronous `get()` under the hood. This method should only be used at server-side (since at server-side, all stored _Clusters_ are simply data pieces).  
-  
-All read/write/exec method will be dump to strings `'_read_'`, `'_write_'`, and `'_exec_'`. If you like to have the function method, use get().  
+Synchronously dump data from `ziee`. This method uses the synchronous `get()` under the hood.  
 
-* Given with both `cid` and `sid` to dump data of a _Spec_.  
-* Given with only `cid` to dump data of a _Cluster_.  
-* Given with no ids to dump data of whole _Clusters_.  
+* Given with both `cid` and `sid` to dump data of a _Spec_.
+* Given with only `cid` to dump data of a _Cluster_.
+* Given with no ids to dump data of all _Clusters_.
+* This method should only be used at server-side (since at server-side, all stored _Clusters_ are simply data pieces).
+* All read/write/exec method will be dump to strings `'_read_'`, `'_write_'`, and `'_exec_'`. If you like to have the function method, use `get()` instead.
 
 **Arguments:**  
 
-1. `cid` (_String_ | _Number_): _Cluster Id_ of the target.  
-2. `sid` (_String_): Spec Id_ of the target, which accepts `'dir'`, `'acls'`, `'attrs'`, and `'cmds'`.  
+1. `cid` (_String_ | _Number_, optional): _Cluster Id_ of the target.  
+2. `sid` (_String_, optional): Spec Id_ of the target, which accepts `'dir'`, `'acls'`, `'attrs'`, and `'cmds'`.  
 
 **Returns:**  
 
@@ -624,17 +658,19 @@ All read/write/exec method will be dump to strings `'_read_'`, `'_write_'`, and 
 
 ```js
 ziee.dumpSync('lightingColorCtrl', 'acls');
-//    {
-//        currentHue: 'RW',
-//        currentSaturation: 'R',
-//        colorMode: 'R'
-//    }
-});
+/* 
+    {
+       currentHue: 'RW',
+       currentSaturation: 'R',
+       colorMode: 'R'
+    }
+*/
 
 ziee.dumpSync('lightingColorCtrl', 'cmds');
-//    {
-//        stepColor: { exec: '_exec_'},
-//        ...
-//    }
-});
+/*
+    {
+      stepColor: { exec: '_exec_'},
+      ...
+    }
+*/
 ```

@@ -1,7 +1,7 @@
 {
   "name": "ziee",
   "version": "0.0.8",
-  "description": "",
+  "description": "A base class to create clusters and abstract hardware for zigbee applications",
   "main": "index.js",
   "scripts": {
     "test": "make test-all"
@@ -21,7 +21,7 @@
     "mocha": "^2.5.3"
   },
   "dependencies": {
-    "busyman": "^0.1.1",
-    "zcl-id": "0.0.5"
+    "busyman": "^0.2.0",
+    "zcl-id": "^0.1.2"
   }
 }
