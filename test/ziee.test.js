@@ -190,7 +190,7 @@ describe('cmds - Ziee Class Functional Check', function () {
     });
 
     it('should execute', function (done) {
-        ziee.exec('lightingColorCtrl', 'moveHue', { x: 'hi', y: 'hello' }, function (err, data) {
+        ziee.exec('cmd', 'lightingColorCtrl', 'moveHue', { x: 'hi', y: 'hello' }, function (err, data) {
             if (data.x === 'hi' && data.y === 'hello')
                 done();
         });
@@ -205,6 +205,70 @@ describe('cmds - Ziee Class Functional Check', function () {
             return ziee.init('lightingColorCtrl', 'cmds', sp, false);
         }).not.to.throw(Error);
         expect(ziee.dumpSync('lightingColorCtrl', 'cmds')).to.be.deep.equal({ foo: { exec: '_exec_' } });
+    });
+});
+
+describe('cmdRsps - Ziee Class Functional Check', function () {
+    var ziee = new Ziee(zapp);
+    var theSpec = {
+        statusChangeNotification: function () {},
+        enrollReq: {
+            exec: function () {}
+        }
+    };
+    ziee.init('ssIasZone', 'cmdRsps', theSpec);
+
+    it('should has statusChangeNotification', function () {
+        expect(ziee.has('ssIasZone', 'cmdRsps', 'statusChangeNotification')).to.be.true;
+    });
+
+    it('should not has statusChangeNotification', function () {
+        expect(ziee.has('ssIasZone', 'cmdRsps', 'statusChangeNotificationX')).to.be.false;
+    });
+
+    it('statusChangeNotification should equal to { exec }', function () {
+        expect(ziee.get('ssIasZone', 'cmdRsps', 'statusChangeNotification').exec).to.be.equal(theSpec.statusChangeNotification);
+    });
+
+    it('enrollReq should equal to { exec }', function () {
+        expect(ziee.get('ssIasZone', 'cmdRsps', 'enrollReq').exec).to.be.equal(theSpec.enrollReq.exec);
+    });
+
+    it('enrollReq should be equal new method after set', function () {
+        var method2 = function (zapp, argObj, cb) {
+            cb(null, argObj);
+        };
+        expect(ziee.set('ssIasZone', 'cmdRsps', 'enrollReq', method2)).to.be.true;
+        expect(ziee.get('ssIasZone', 'cmdRsps', 'enrollReq').exec).to.be.equal(method2);
+    });
+
+    it('should not dump - unredable', function (done) {
+        ziee.dump('ssIasZone', 'cmdRsps', function (err, data) {
+            if (err)
+                done();
+        });
+    });
+
+    it('should dump syncly', function () {
+        expect(ziee.dumpSync('ssIasZone', 'cmdRsps')).to.be.deep.equal({ enrollReq: { exec: "_exec_"}, statusChangeNotification: { exec: "_exec_"} });
+    });
+
+    it('should execute', function (done) {
+        ziee.exec('cmdRsp', 'ssIasZone', 'enrollReq', { x: 'hi', y: 'hello' }, function (err, data) {
+            if (data.x === 'hi' && data.y === 'hello')
+                done();
+        });
+    });
+
+    it('should init something else', function () {
+        var sp = {
+                foo: function () {}
+            };
+
+        expect(function () {
+            return ziee.init('ssIasZone', 'cmdRsps', sp, false);
+        }).not.to.throw(Error);
+        expect(ziee.dumpSync('ssIasZone', 'cmdRsps')).to.be.deep.equal({ foo: { exec: '_exec_' } });
     });
 });
 
