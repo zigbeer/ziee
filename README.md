@@ -43,10 +43,10 @@ Here is a quick example that will walk you through the steps of initializing a '
         zApp = {};  //  Your zigbee application, I take a mock object here as an example
     ```
 
-* **Step 2**: New a ziee instance. Then, initialize a 'lightingColorCtrl' cluster in your ziee, including the cluster's (1) direction (2) attributes (3) access control flgas, and (4) zcl commands.
+* **Step 2**: New a ziee instance. Then, initialize a 'lightingColorCtrl' cluster in your ziee, including the cluster's (1) direction (2) attributes (3) access control flags, and (4) zcl commands.
 
     ```js
-    var ziee = new ziee();
+    var ziee = new Ziee();
     ```
 
     - Step **(2-1)**: Direction. Tell ziee that this is an input, output, or input/output cluster.  
@@ -79,7 +79,7 @@ Here is a quick example that will walk you through the steps of initializing a '
         }); 
         ```
 
-    - Step **(2-3)**: Access control flgas. Specify the access control of each attribute. The `'acls'` spec is used to control the authority from remote access. The local access depends on read/write methods, not depends on these flags.  
+    - Step **(2-3)**: Access control flags. Specify the access control of each attribute. The `'acls'` spec is used to control the authority from remote access. The local access depends on read/write methods, not depends on these flags.  
 
         ```js
         // 'RW': readable and writable, 'R': read-only, 'W': write-only
@@ -223,7 +223,7 @@ ziee.dump('lightingColorCtrl', 'acls', function (err, data) {
 ### Synchronous dump
 
 ```js
-// dump acces control flags
+// dump access control flags
 ziee.dumpSync('lightingColorCtrl', 'acls');
 /*
     {
@@ -293,7 +293,7 @@ Initialize your cluster and all its specs. Here, a `spec` is an object required 
 
 1. `cid` (_String_ | _Number_): _Cluster Id_. Will be turned into a key in string internally.  
 2. `sid` (_String_): _Spec Id_, which accepts `'dir'`, `'acls'`, `'attrs'`, and `'cmds'`.  
-3. `spec` (_Object_): An object holds all _Resources_ (attribues, flags, command methods, ...) corresponding to which `sid` to be initialized.  
+3. `spec` (_Object_): An object holds all _Resources_ (attributes, flags, command methods, ...) corresponding to which `sid` to be initialized.  
 4. `isZcl` (_Boolean_): Optional. Force to use ZCL-defined ids if `true`, and default is `true`. If you like to add something that is not ZCL-defined, please init() it with `false` (highly not recommended).  
 
 **Returns:**  
@@ -406,7 +406,7 @@ To see if `ziee` has the specified _Cluster_, Cluster Spec_, or _Cluster Resourc
 **Arguments:**  
 
 1. `cid` (_String_ | _Number_): _Cluster Id_ of the target.  
-2. `sid` (_String_): Spec Id_ of the target, which accepts `'dir'`, `'acls'`, `'attrs'`, and `'cmds'.  
+2. `sid` (_String_): _Spec Id_ of the target, which accepts `'dir'`, `'acls'`, `'attrs'`, and `'cmds'`.  
 3. `rid` (_String_ | _Number_): _Resource Id_ of the target. (_Resource Id_ is also the _Attribute Id_ if `sid == 'attrs'`)  
 
 **Returns:**  
@@ -431,7 +431,7 @@ Synchronously get the specified _Resource_.
 **Arguments:**  
 
 1. `cid` (_String_ | _Number_): _Cluster Id_ of the target.  
-2. `sid` (_String_): Spec Id_ of the target, which accepts `'dir'`, `'acls'`, `'attrs'`, and `'cmds'`.  
+2. `sid` (_String_): _Spec Id_ of the target, which accepts `'dir'`, `'acls'`, `'attrs'`, and `'cmds'`.  
 3. `rid` (_String_ | _Number_): _Resource Id_ of the target. (_Resource Id_ is also the _Attribute Id_ if `sid == 'attrs'`)  
 
 **Returns:**  
@@ -459,7 +459,7 @@ Synchronously set a value to the specified _Resource_.
 **Arguments:**  
 
 1. `cid` (_String_ | _Number_): _Cluster Id_ of the target.  
-2. `sid` (_String_): Spec Id_ of the target, which accepts `'dir'`, `'acls'`, `'attrs'`, and `'cmds'`.  
+2. `sid` (_String_): _Spec Id_ of the target, which accepts `'dir'`, `'acls'`, `'attrs'`, and `'cmds'`.  
 3. `rid` (_String_ | _Number_): _Resource Id_ of the target. (_Resource Id_ is also the _Attribute Id_ if `sid == 'attrs'`)  
 4. `value` (_Primitives_ | _Object_): _Resource_ data or an object with read/write/exec method(s). This method will throw you an error if `value` is given with a function.  
 
@@ -536,7 +536,7 @@ Asynchronously write a value to the specified _Attribute_.
 |----------------|------------------|---------------------------------------------------------------------|  
 | Error object   | `'_notfound_'`   | _Attribute_ not found.                                              |  
 | Error object   | `'_unwritable_'` | _Attribute_ is unwritable.                                          |  
-| Error object   | `'_exec_'`       | _Attribute_ is unwritable (Becasue it is an executable _Resource_). |  
+| Error object   | `'_exec_'`       | _Attribute_ is unwritable (Because it is an executable _Resource_). |  
 | `null`         | Depends          | _Attribute_ is successfully write.                                  |  
 
 **Returns:**  
@@ -569,7 +569,7 @@ Execute the specified _Command_. The executable _Command_ is a ZCL-defined funct
 1. `cid` (_String_ | _Number_): _Cluster Id_.
 2. `cmdId` (_String_ | _Number_): _Command Id_ within the cluster.
 3. `argObj` (_Object_): The parameters required by the command.
-4. `callback` (_Function_): `function (err, data) { ... }`. Will be called when execution is performed or any error occurs, where `data` is your command should repond back.
+4. `callback` (_Function_): `function (err, data) { ... }`. Will be called when execution is performed or any error occurs, where `data` is your command should respond back.
   
 * To see what kind of data you should respond back upon receiving a command, please go to [ZCL Functional Command Reference Table](https://github.com/zigbeer/zcl-packet#32-zcl-functional-command-reference-table) for more information.
     - For example, when you receive a **'getWeeklySchedule'** command, you should respond a **'getWeeklyScheduleRsp'** response to the requester.  
@@ -596,7 +596,7 @@ ziee.exec('hvacThermostat', 'getWeeklySchedule', {
     if (!err)
         console.log(data);
 /*
-    data is 'getWeeklyScheduleRsp' response data obejct defined by ZCL, and
+    data is 'getWeeklyScheduleRsp' response data object defined by ZCL, and
     your exec function should return an object like:
 
     {
@@ -623,7 +623,7 @@ Asynchronously dump data from `ziee`. This method uses the asynchronous `read()`
 **Arguments:**  
 
 1. `cid` (_String_ | _Number_): _Cluster Id_ of the target.  
-2. `sid` (_String_): Spec Id_ of the target, which accepts `'dir'`, `'acls'`, `'attrs'`, and `'cmds'`.  
+2. `sid` (_String_): _Spec Id_ of the target, which accepts `'dir'`, `'acls'`, `'attrs'`, and `'cmds'`.  
 3. `callback` (_Function_): `function (err, data) { }`.  
 
 **Returns:**  
@@ -693,7 +693,7 @@ Synchronously dump data from `ziee`. This method uses the synchronous `get()` un
 **Arguments:**  
 
 1. `cid` (_String_ | _Number_): _Cluster Id_ of the target.  
-2. `sid` (_String_): Spec Id_ of the target, which accepts `'dir'`, `'acls'`, `'attrs'`, and `'cmds'`.  
+2. `sid` (_String_): _Spec Id_ of the target, which accepts `'dir'`, `'acls'`, `'attrs'`, and `'cmds'`.  
 
 **Returns:**  
 
