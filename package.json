@@ -1,6 +1,6 @@
 {
   "name": "ziee",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "A base class to create clusters and abstract hardware for zigbee applications",
   "main": "index.js",
   "scripts": {
